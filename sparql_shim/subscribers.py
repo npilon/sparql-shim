@@ -1,5 +1,4 @@
 import httplib2
-
 from pymantic.SPARQL import SPARQLServer
 
 from pyramid.threadlocal import get_current_request
