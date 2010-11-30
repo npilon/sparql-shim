@@ -1,7 +1,13 @@
+import httplib2
+
+from pymantic.SPARQL import SPARQLServer
+
 from pyramid.threadlocal import get_current_request
 from pyramid.exceptions import ConfigurationError
 from pyramid.url import route_url
+from pyramid.events import subscriber, BeforeRender, NewRequest
 
+@subscriber(BeforeRender)
 def add_renderer_globals(event):
     """ A subscriber to the ``pyramid.events.BeforeRender`` events.  Updates
     the :term:`renderer globals` with values that are familiar to Pylons
@@ -22,3 +28,8 @@ def add_renderer_globals(event):
         except ConfigurationError:
             pass
     event.update(globs)
+
+@subscriber(NewRequest)
+def per_request_objects(event):
+    event.request.http = httplib2.Http()
+    event.request.sparql = SPARQLServer(query_url = event.request.registry['sparql.url'])

@@ -7,11 +7,13 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
-    config.add_static_view('static', 'sparql_shim:static/')
-    config.add_handler('action', '/{action}', 'sparql_shim.handlers:MyHandler')
-    config.add_handler('home', '/', 'sparql_shim.handlers:MyHandler',
-                       action='index')
-    config.add_subscriber('sparql_shim.subscribers.add_renderer_globals',
-                          'pyramid.events.BeforeRender')
-    return config.make_wsgi_app()
+    
+    config.registry['sparql.url'] = settings['sparql.url']
 
+    config.add_static_view('static', 'sparql_shim:static/')
+    config.add_handler('indirect', '/', 'sparql_shim.handlers:GraphHandler',
+                       action='indirect')
+    config.add_handler('direct', '/{name:.+}', 'sparql_shim.handlers:GraphHandler',
+                       action='direct')
+    config.scan('sparql_shim.subscribers')
+    return config.make_wsgi_app()
