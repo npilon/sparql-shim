@@ -1,5 +1,13 @@
-This file is for you to describe the sparql_shim application. Typically
-you would include information such as the information below:
+sparql_shim provides a SPARQL 1.1 Uniform HTTP Protocol interface to any
+SPARQL 1.1 Update-capable graph store.
+
+The SPARQL 1.1 Uniform HTTP Protocol is described at:
+
+http://www.w3.org/TR/sparql11-http-rdf-update/
+
+The SPARQL 1.1 Update standard is described at:
+
+http://www.w3.org/TR/2009/WD-sparql11-update-20091022/
 
 Installation and Setup
 ======================
