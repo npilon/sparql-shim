@@ -1,0 +1,3 @@
+include sparql_shim/config/deployment.ini_tmpl
+recursive-include sparql_shim/public *
+recursive-include sparql_shim/templates *
