@@ -10,6 +10,8 @@ requires = ['pyramid',
             'pyramid_beaker',
             'WebError',
             'httplib2',
+            'rdflib',
+            'pymantic',
             ]
 
 setup(name='sparql_shim',
