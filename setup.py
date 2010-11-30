@@ -6,7 +6,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.txt')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
-requires = ['pyramid', 'pyramid_beaker', 'WebError']
+requires = ['pyramid',
+            'pyramid_beaker',
+            'WebError',
+            'httplib2',
+            ]
 
 setup(name='sparql_shim',
       version='0.0',
@@ -18,9 +22,9 @@ setup(name='sparql_shim',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
-      author='',
-      author_email='',
-      url='',
+      author='Nicholas Pilon',
+      author_email='npilon@gmail.com',
+      url='https://github.com/npilon/sparql-shim',
       keywords='web pylons',
       packages=find_packages(),
       include_package_data=True,
