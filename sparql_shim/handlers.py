@@ -12,7 +12,7 @@ from sparql_shim.parsers import parse_n3, parse_ntriples, parse_rdfxml
 class GraphHandler(object):
     def __init__(self, request):
         self.request = request
-        self.graph_uri = request.url
+        self.graph_uri = request.url # TODO: indirect specification handling.
         
     def _get_graph(self, graph_uri):
         query = 'CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <%(graph_uri)s> { ?s ?p ?o } }'

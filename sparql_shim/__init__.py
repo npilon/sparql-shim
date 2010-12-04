@@ -15,9 +15,7 @@ def main(global_config, **settings):
     config.registry['sparql.url'] = settings['sparql.url']
 
     config.add_static_view('static', 'sparql_shim:static/')
-    config.add_handler('indirect', '/', 'sparql_shim.handlers:GraphHandler',
-                       action='indirect')
-    config.add_handler('direct', '/{name:.+}', 'sparql_shim.handlers:GraphHandler',
-                       action='direct')
+    config.add_handler('graph', '/{name:.*}', 'sparql_shim.handlers:GraphHandler',
+                       action='graph')
     config.scan('sparql_shim.subscribers')
     return config.make_wsgi_app()
