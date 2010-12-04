@@ -5,6 +5,10 @@ def main(global_config, **settings):
     """
     from pyramid.configuration import Configurator
     config = Configurator(settings=settings)
+    config.add_renderer(name = 'nt', factory='.renderers.NTriplesGraphRenderer')
+    config.add_renderer(name = 'rdfxml', factory='.renderers.RDFXMLGraphRenderer')
+    config.add_renderer(name = 'n3', factory='.renderers.N3GraphRenderer')
+    
     session_factory = session_factory_from_settings(settings)
     config.set_session_factory(session_factory)
     

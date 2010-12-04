@@ -7,9 +7,12 @@ from pyramid.response import Response
 from pyramid.httpexceptions import HTTPForbidden, HTTPOk, HTTPCreated,\
      HTTPAccepted, HTTPNoContent
 
+from sparql_shim.parsers import parse_n3, parse_ntriples, parse_rdfxml
+
 class GraphHandler(object):
     def __init__(self, request):
         self.request = request
+        self.graph_uri = request.url
         
     def _get_graph(self, graph_uri):
         query = 'CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <%(graph_uri)s> { ?s ?p ?o } }'
@@ -32,91 +35,42 @@ class GraphHandler(object):
         query = query % dict(graph_uri = graph_uri)
         self.request.sparql.query(query)
     
-    @action(name = 'direct', request_method = 'GET', accept='text/plain')
-    def direct_get_nt(self):
-        graph_uri = self.request.url
-        graph = self._get_graph(graph_uri)
-        return Response(body = graph.serialize(format = 'nt'),
-                        content_type = 'text/plain')
+    @action(name='graph', request_method='GET', accept='text/plain', renderer='nt')
+    @action(name='graph', request_method='GET', accept='text/rdf+n3', renderer='n3')
+    @action(name='graph', request_method='GET', accept='application/rdf+xml',
+            renderer='rdfxml')
+    def get_graph(self):
+        return self._get_graph(self.graph_uri)
     
-    @action(name = 'direct', request_method = 'POST',
+    @action(name='graph', request_method='POST', custom_predicates=[parse_ntriples],
             header='content-type:text/plain')
-    def direct_post_nt(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'nt')
-        self._insert_graph(graph_uri, graph)
-        return HTTPNoContent
+    @action(name='graph', request_method='POST', custom_predicates=[parse_n3],
+            header='content-type:text/rdf+n3')
+    @action(name='graph', request_method='POST', custom_predicates=[parse_rdfxml],
+            header='content-type:application/rdf+xml')
+    def post_graph(self):
+        self._insert_graph(self.graph_uri, self.request.body_graph)
+        return HTTPNoContent()
     
-    @action(name = 'direct', request_method = 'PUT',
+    @action(name='graph', request_method='PUT', custom_predicates=[parse_ntriples],
             header='content-type:text/plain')
-    def direct_put_nt(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'nt')
-        self._replace_graph(graph_uri, graph)
-        return HTTPNoContent
-    
-    @action(name = 'direct', request_method = 'GET', accept='text/rdf+n3')
-    def direct_get_n3(self):
-        graph_uri = self.request.url
-        graph = self._get_graph(graph_uri)
-        return Response(body = graph.serialize(format = 'n3'),
-                        content_type = 'text/rdf+n3')
-    
-    @action(name = 'direct', request_method = 'POST',
+    @action(name='graph', request_method='PUT', custom_predicates=[parse_n3],
             header='content-type:text/rdf+n3')
-    def direct_post_n3(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'n3')
-        self._insert_graph(graph_uri, graph)
-        return HTTPNoContent
-    
-    @action(name = 'direct', request_method = 'PUT',
-            header='content-type:text/rdf+n3')
-    def direct_put_n3(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'n3')
-        self._replace_graph(graph_uri, graph)
-        return HTTPNoContent
-
-    @action(name = 'direct', request_method = 'GET',
-            accept='application/rdf+xml')
-    def direct_get_rdfxml(self):
-        graph_uri = self.request.url
-        graph = self._get_graph(graph_uri)
-        return Response(body = graph.serialize(format = 'xml'),
-                        content_type = 'text/rdf+n3')
-    
-    @action(name = 'direct', request_method = 'POST',
+    @action(name='graph', request_method='PUT', custom_predicates=[parse_rdfxml],
             header='content-type:application/rdf+xml')
-    def direct_post_rdfxml(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'xml')
-        self._insert_graph(graph_uri, graph)
-        return HTTPNoContent
+    def put_graph(self):
+        self._replace_graph(self.graph_uri, self.request.body_graph)
+        return HTTPNoContent()
     
-    @action(name = 'direct', request_method = 'PUT',
-            header='content-type:application/rdf+xml')
-    def direct_put_rdfxml(self):
-        graph_uri = self.request.url
-        graph = rdflib.Graph()
-        graph.parse(StringIO(self.request.body), format = 'xml')
-        self._replace_graph(graph_uri, graph)
-        return HTTPNoContent
-    
-    @action(name = 'direct', request_method = 'DELETE')
-    def direct_delete(self):
+    @action(name='graph', request_method='DELETE')
+    def delete_graph(self):
         graph_uri = self.request.url
         try:
             self._drop_graph(graph_uri, silent = False)
-            return HTTPNoContent
+            return HTTPNoContent()
         except:
-            return HTTPForbidden
+            return HTTPForbidden()
     
-    @action(name = 'direct', request_method = 'PATCH')
+    @action(name='graph', request_method='PATCH')
     def direct_patch(self):
         pass
