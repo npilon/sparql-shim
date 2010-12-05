@@ -42,12 +42,12 @@ class GraphHandler(object):
     def get_graph(self):
         return self._get_graph(self.graph_uri)
     
+    @action(name='graph', request_method='POST', custom_predicates=[parse_n3],
+            header='content-type:text/rdf\\+n3')
+    @action(name='graph', request_method='POST', custom_predicates=[parse_rdfxml],
+            header='content-type:application/rdf\\+xml')
     @action(name='graph', request_method='POST', custom_predicates=[parse_ntriples],
             header='content-type:text/plain')
-    @action(name='graph', request_method='POST', custom_predicates=[parse_n3],
-            header='content-type:text/rdf+n3')
-    @action(name='graph', request_method='POST', custom_predicates=[parse_rdfxml],
-            header='content-type:application/rdf+xml')
     def post_graph(self):
         self._insert_graph(self.graph_uri, self.request.body_graph)
         return HTTPNoContent()
@@ -55,9 +55,9 @@ class GraphHandler(object):
     @action(name='graph', request_method='PUT', custom_predicates=[parse_ntriples],
             header='content-type:text/plain')
     @action(name='graph', request_method='PUT', custom_predicates=[parse_n3],
-            header='content-type:text/rdf+n3')
+            header='content-type:text/rdf\\+n3')
     @action(name='graph', request_method='PUT', custom_predicates=[parse_rdfxml],
-            header='content-type:application/rdf+xml')
+            header='content-type:application/rdf\\+xml')
     def put_graph(self):
         self._replace_graph(self.graph_uri, self.request.body_graph)
         return HTTPNoContent()
